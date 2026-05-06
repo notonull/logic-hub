@@ -134,8 +134,11 @@ tar -zxvf nginx-*.tar.gz
 ```bash
 ## cd 源码包
 cd /opt/src/nginx-*
-## 编译
+## 配置
 ./configure --prefix=/opt/app/nginx --with-http_stub_status_module --without-http-cache --with-http_ssl_module --with-http_gzip_static_module --with-ipv6
+## 配置命令示例 http2
+./configure --prefix=/opt/app/nginx --with-http_stub_status_module --with-http_ssl_module --with-http_gzip_static_module --with-stream --with-stream_ssl_module --with-pcre --with-http_v2_module
+
 ```
 
 | 参数                             | 说明                                                       |
@@ -167,6 +170,47 @@ cd /opt/app/nginx
 
 [【Nginx】conf配置模板](../代码模板/Nginx%20conf配置模板.md)
 
+### 4.2.ssl配置
+
+```bash
+## 切换到nginx部署目录
+cd /opt/app/nginx
+## 创建证书目录
+mkdir ssl
+## 移动奥证书目录
+cd ssl
+## 写入证书生成配置 *替换cnf必要配置
+cat > openssl.cnf << 'EOF'
+[req]
+default_bits       = 2048
+prompt             = no
+default_md         = sha256
+req_extensions     = req_ext
+distinguished_name = dn
+
+[dn]
+C    = CN
+ST   = Hainan
+L    = Dongfang
+O    = My Company
+OU   = Prod
+CN   = 192.168.44.158
+
+[req_ext]
+subjectAltName = @alt_names
+
+[alt_names]
+IP.1   = 192.168.44.158
+DNS.1  = localhost
+EOF
+## 生成证书 10年自签证书
+openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+  -keyout /opt/app/nginx/ssl/selfsigned.key \
+  -out /opt/app/nginx/ssl/selfsigned.crt \
+  -config openssl.cnf \
+  -extensions req_ext
+
+```
 ## 常用命令
 
 ```bash
