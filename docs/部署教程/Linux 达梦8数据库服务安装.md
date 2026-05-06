@@ -66,5 +66,8 @@ CREATE SCHEMA TEST_EU AUTHORIZATION TEST_EU;
 ## 常用命令
 
 ```bash
+cd /home/dmdba/dmdbms/bin/ 
+./disql SYSDBA/Test,123 >/home/**/**.sql
+
 ```
 
